@@ -1,0 +1,6 @@
+{
+  "AllWindowsSpecialCommand": "AllWindows",
+  "WindowSwitchSignifier": "-> ",
+  "BlackList": [ ],
+  "FuzzySearchThreshold": 5
+}

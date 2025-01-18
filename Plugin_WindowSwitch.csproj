@@ -27,6 +27,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Quokka\Quokka.csproj"></ProjectReference>
   </ItemGroup>
+  
+  <ItemGroup>
+    <ContentWithTargetPath Include="settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>settings.json</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup>
 
   <ItemGroup>
     <ContentWithTargetPath Include="Icons By Icons8.txt">
