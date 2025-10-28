@@ -1,4 +1,3 @@
-
 using Newtonsoft.Json;
 using Quokka.ListItems;
 using Quokka.PluginArch;
@@ -35,20 +34,16 @@ namespace Plugin_WindowSwitch {
 
 
     private List<ListItem> ProduceItems(string query) {
-      List<ListItem> items = new();
-      foreach (window w in openWindows) {
-        if (( w.ProcessName.Contains(query, StringComparison.OrdinalIgnoreCase)
-          || w.Title.Contains(query, StringComparison.OrdinalIgnoreCase)
-                || FuzzySearch.LD(w.ProcessName, query) < PluginSettings.FuzzySearchThreshold
-                || FuzzySearch.LD(w.Title, query) < PluginSettings.FuzzySearchThreshold ) && !PluginSettings.BlackList.Contains(w.Title)
-                && !PluginSettings.BlackList.Contains(w.ProcessName)
-                ) {
-          items.Add(new WindowItem(w));
-        }
-      }
-      return items;
-    }
+      return
 
+      FuzzySearch.searchAll(query, openWindows.Select(x => x.ProcessName).ToList(), PluginSettings.FuzzySearchThreshold).Concat(
+
+        FuzzySearch.searchAll(query, openWindows.Select(x => x.Title).ToList(), PluginSettings.FuzzySearchThreshold)
+
+        ).Where(x => !PluginSettings.BlackList.Contains(x.Value))
+        .Select(x => (ListItem) new WindowItem(openWindows[x.Index])
+      ).Distinct().ToList();
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -98,7 +93,7 @@ namespace Plugin_WindowSwitch {
     /// <returns>List of windows that possibly match what is being searched for (windows that do not have their ProcessName or Title in the blacklist)</returns>
     public override List<ListItem> OnSignifier(string command) {
       command = command.Substring(PluginSettings.WindowSwitchSignifier.Length);
-      return ProduceItems(command);
+      return FuzzySearch.sort(command, ProduceItems(command)).ToList();
     }
 
 

@@ -22,10 +22,9 @@
     /// <summary>
     ///   The threshold for when to consider a window title or process name
     ///   is similar enough to the query for it to be
-    ///   displayed (defaults to 5). Currently uses the
-    ///   Levenshtein distance; the larger the number, the
-    ///   bigger the difference.
+    ///   displayed (defaults to 60). The larger the number, the
+    ///   more similar it needs to be.
     /// </summary>
-    public int FuzzySearchThreshold { get; set; } = 5;
+    public int FuzzySearchThreshold { get; set; } = 60;
   }
 }
