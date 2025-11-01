@@ -1,5 +1,6 @@
 ﻿using Quokka;
 using Quokka.ListItems;
+using Quokka.PluginArch;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 
@@ -15,11 +16,13 @@ namespace Plugin_WindowSwitch {
     IntPtr WindowHandle;
 
     public WindowItem(window window) {
-      this.WindowHandle = window.handle;
-      this.Name = $"{window.ProcessName} | {window.Title}";
-      this.Description = $"Process: {window.ProcessName} | PID: {window.ID}";
-      this.Icon = new BitmapImage(new Uri(
-          Environment.CurrentDirectory + "\\PlugBoard\\Plugin_WindowSwitch\\Plugin\\switchTo.png"));
+      WindowHandle = window.handle;
+      Name = $"{window.ProcessName} | {window.Title}";
+      Description = $"Process: {window.ProcessName} | PID: {window.ID}";
+      UiDispatcher.BeginInvoke(() => {
+        Icon = new BitmapImage(new Uri(
+            Environment.CurrentDirectory + "\\PlugBoard\\Plugin_WindowSwitch\\Plugin\\switchTo.png"));
+      });
     }
 
     //When item is selected, open the window
