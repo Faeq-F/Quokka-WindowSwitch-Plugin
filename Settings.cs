@@ -1,10 +1,13 @@
-﻿namespace PluginWindowSwitch
+using System.Collections.ObjectModel;
+
+namespace PluginWindowSwitch
 {
 
 
   /// <summary>
   ///   The settings for this (Gitmoji) plugin
   /// </summary>
+#pragma warning disable CA1724 // Type name conflicts with namespace name
   public class Settings
   {
 
@@ -20,7 +23,7 @@
     ///   List of window titles or process names for windows to not show (defaults to
     ///   empty - all windows can be shown)
     /// </summary>
-    public List<string> BlackList { get; set; } = new List<string>(Array.Empty<string>());
+    public Collection<string> BlackList { get; } = new();
     /// <summary>
     ///   The threshold for when to consider a window title or process name
     ///   is similar enough to the query for it to be

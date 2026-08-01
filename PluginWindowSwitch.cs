@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using WinCopies.Util;
 
 namespace PluginWindowSwitch
 {
@@ -17,6 +16,7 @@ namespace PluginWindowSwitch
 
     private List<Window> openWindows = new();
     [DllImport("user32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern bool IsIconic(IntPtr hWnd);
 
     /// <summary>
@@ -24,8 +24,7 @@ namespace PluginWindowSwitch
     /// </summary>
     public override string PluginName { get; set; } = "WindowSwitch";
 
-    private static Settings pluginSettings = new();
-    internal static Settings PluginSettings { get => pluginSettings; set => pluginSettings = value; }
+    internal static Settings PluginSettings { get; set; } = new();
 
     /// <summary>
     /// Loads plugin settings
@@ -41,9 +40,9 @@ namespace PluginWindowSwitch
     {
       return new Collection<ListItem>(
 
-      FuzzySearch.SearchAll(query, new Collection<string>(openWindows.Select(x => x.ProcessName).ToList()), PluginSettings.FuzzySearchThreshold).Concat(
+      FuzzySearch.SearchAll(query, new Collection<string>(openWindows.ConvertAll(x => x.ProcessName)), PluginSettings.FuzzySearchThreshold).Concat(
 
-        FuzzySearch.SearchAll(query, new Collection<string>(openWindows.Select(x => x.Title).ToList()), PluginSettings.FuzzySearchThreshold)
+        FuzzySearch.SearchAll(query, new Collection<string>(openWindows.ConvertAll(x => x.Title)), PluginSettings.FuzzySearchThreshold)
 
         ).Where(x => !PluginSettings.BlackList.Contains(x.Value))
         .Select(x => (ListItem)new WindowItem(openWindows[x.Index])
@@ -67,7 +66,7 @@ namespace PluginWindowSwitch
       foreach (Process process in currentProcesses)
       {
         // If the process appears on the Taskbar (if has a title)
-        if (!String.IsNullOrEmpty(process.MainWindowTitle))
+        if (!string.IsNullOrEmpty(process.MainWindowTitle))
         {
           Dictionary<IntPtr, string> windows = (Dictionary<IntPtr, string>)WindowEnumerator.GetOpenWindowsFromPID(process.Id);
           IntPtr mainWindowHandle = IntPtr.Zero;
@@ -142,18 +141,18 @@ namespace PluginWindowSwitch
     }
   }
 
-  internal class Window
+  internal sealed class Window
   {
-    public IntPtr handle;
-    public int ID;
-    public String ProcessName;
-    public String Title;
-    internal Window(String ProcessName, String Title, IntPtr handle, int ID)
+    public IntPtr Handle { get; }
+    public int Id { get; }
+    public string ProcessName { get; }
+    public string Title { get; }
+    internal Window(string processName, string title, IntPtr handle, int id)
     {
-      this.ProcessName = ProcessName;
-      this.Title = Title;
-      this.handle = handle;
-      this.ID = ID;
+      ProcessName = processName;
+      Title = title;
+      Handle = handle;
+      Id = id;
     }
   }
 

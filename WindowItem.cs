@@ -1,26 +1,28 @@
-﻿using Quokka;
 using Quokka.ListItems;
 using Quokka.PluginArch;
 using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace PluginWindowSwitch
 {
-  class WindowItem : ListItem
+  internal sealed class WindowItem : ListItem
   {
 
 
     [DllImport("user32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
     [DllImport("user32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-    readonly IntPtr WindowHandle;
+    private readonly IntPtr WindowHandle;
 
     public WindowItem(Window window)
     {
-      WindowHandle = window.handle;
+      WindowHandle = window.Handle;
       Name = $"{window.ProcessName} | {window.Title}";
-      Description = $"Process: {window.ProcessName} | PID: {window.ID}";
+      Description = $"Process: {window.ProcessName} | PID: {window.Id}";
       Icon = IconCache.GetOrAdd(
         Environment.CurrentDirectory + "\\PlugBoard\\PluginWindowSwitch\\Plugin\\switchTo.png"
       );
@@ -31,7 +33,7 @@ namespace PluginWindowSwitch
     {
       ShowWindow(WindowHandle, 9);
       SetForegroundWindow(WindowHandle);
-      App.Current.MainWindow.Close();
+      Application.Current.MainWindow.Close();
     }
   }
 }

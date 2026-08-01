@@ -1,30 +1,35 @@
-﻿using System.Runtime.InteropServices;
-using System.Text;
+using System.Runtime.InteropServices;
 
 namespace PluginWindowSwitch
 {
-  delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
+  internal delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
   /// <summary>
   /// Gets Windows from Processes
   /// </summary>
   public static class WindowEnumerator
   {
     [DllImport("user32.dll", SetLastError = true)]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
     [DllImport("USER32.DLL")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern bool EnumWindows(EnumWindowsProc enumFunc, int lParam);
 
-    [DllImport("USER32.DLL")]
-    private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+    [DllImport("USER32.DLL", CharSet = CharSet.Unicode, SetLastError = true)]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern int GetWindowText(IntPtr hWnd, [Out] char[] lpString, int nMaxCount);
 
     [DllImport("USER32.DLL")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern int GetWindowTextLength(IntPtr hWnd);
 
     [DllImport("USER32.DLL")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern bool IsWindowVisible(IntPtr hWnd);
 
     [DllImport("USER32.DLL")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern IntPtr GetShellWindow();
 
     /// <summary>
@@ -37,20 +42,35 @@ namespace PluginWindowSwitch
       IntPtr hShellWindow = GetShellWindow();
       Dictionary<IntPtr, string> dictWindows = new();
 
-      EnumWindows(delegate (IntPtr hWnd, int lParam)
+#pragma warning disable RCS1163
+      EnumWindows((hWnd, lParam) =>
+# pragma warning restore RCS1163
       {
-        if (hWnd == hShellWindow) return true;
-        if (!IsWindowVisible(hWnd)) return true;
+        if (hWnd == hShellWindow)
+        {
+          return true;
+        }
+        if (!IsWindowVisible(hWnd))
+        {
+          return true;
+        }
 
         int length = GetWindowTextLength(hWnd);
-        if (length == 0) return true;
+        if (length == 0)
+        {
+          return true;
+        }
 
-        GetWindowThreadProcessId(hWnd, out uint windowPid);
-        if (windowPid != processID) return true;
+        _ = GetWindowThreadProcessId(hWnd, out uint windowPid);
+        if (windowPid != (uint)processID)
+        {
+          return true;
+        }
 
-        StringBuilder stringBuilder = new(length);
-        GetWindowText(hWnd, stringBuilder, length + 1);
-        dictWindows.Add(hWnd, stringBuilder.ToString());
+        char[] buffer = new char[length + 1];
+        _ = GetWindowText(hWnd, buffer, buffer.Length);
+        string title = new(buffer, 0, length);
+        dictWindows.Add(hWnd, title);
         return true;
       }, 0);
 
