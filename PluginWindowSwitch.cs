@@ -22,7 +22,13 @@ namespace PluginWindowSwitch
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public override string PluginName { get; set; } = "WindowSwitch";
+    public override string PluginName { get; set; } = "Window Switch";
+
+    /// <summary>
+    /// Gets the icon for the window switch plugin.
+    /// </summary>
+    public override System.Windows.Media.ImageSource? PluginIcon =>
+      IconCache.GetOrAdd(Path.Combine(Environment.CurrentDirectory, "PlugBoard", "PluginWindowSwitch", "Plugin", "switchTo.png"));
 
     internal static Settings PluginSettings { get; set; } = new();
 
@@ -34,7 +40,6 @@ namespace PluginWindowSwitch
       string fileName = Environment.CurrentDirectory + "\\PlugBoard\\PluginWindowSwitch\\Plugin\\settings.json";
       PluginSettings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(fileName))!;
     }
-
 
     private Collection<ListItem> ProduceItems(string query)
     {
@@ -82,8 +87,6 @@ namespace PluginWindowSwitch
       }
     }
 
-
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -94,7 +97,6 @@ namespace PluginWindowSwitch
     {
       return new Collection<string>() { PluginSettings.WindowSwitchSignifier };
     }
-
 
     /// <summary>
     /// <inheritdoc/>
@@ -107,7 +109,6 @@ namespace PluginWindowSwitch
       command = command.Substring(PluginSettings.WindowSwitchSignifier.Length);
       return FuzzySearch.Sort(command, ProduceItems(command));
     }
-
 
     /// <summary>
     /// <inheritdoc/>
@@ -156,9 +157,4 @@ namespace PluginWindowSwitch
     }
   }
 
-
-
 }
-
-
-
